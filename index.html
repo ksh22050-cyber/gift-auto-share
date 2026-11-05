@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>카카오 체험단 TOP 30</title>
+
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+    integrity="sha384-Ti8K4a4v9w9G4yXyJ6v5u4Q0G6v1zQ7fQ8v8Q4z2Q6f5v8x5y4z3w2v1u0t9s8r7"
+    crossorigin="anonymous"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #f5f6f8;
+      color: #222;
+      font-family: Arial, "Malgun Gothic", sans-serif;
+    }
+
+    header {
+      background: #fee500;
+      padding: 25px 18px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 23px;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .summary {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .share-all {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 15px;
+      background: #fee500;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 18px;
+    }
+
+    .product {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+
+    .rank {
+      font-size: 13px;
+      font-weight: bold;
+      color: #777;
+      margin-bottom: 7px;
+    }
+
+    .product h2 {
+      font-size: 17px;
+      margin: 0 0 10px;
+      line-height: 1.5;
+    }
+
+    .brand {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .detail {
+      background: #f6f6f6;
+      padding: 9px;
+      border-radius: 8px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .actions a, .actions button {
+      flex: 1;
+      text-align: center;
+      text-decoration: none;
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 5px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .product-link {
+      color: white;
+      background: #333;
+    }
+
+    .share-one {
+      color: #222;
+      background: #fee500;
+    }
+
+    .notice {
+      text-align: center;
+      color: #777;
+      font-size: 13px;
+      padding: 25px 10px;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>카카오 체험단 TOP 30</h1>
+    <p>오늘의 체험단 추천 상품 모음</p>
+  </header>
+
+  <main>
+    <div class="summary" id="summary">
+      상품 목록을 불러오는 중입니다.
+    </div>
+
+    <button class="share-all" onclick="sharePage()">
+      카카오톡으로 TOP 30 공유하기
+    </button>
+
+    <section id="products"></section>
+  </main>
+
+  <script>
+    // 카카오 Developers에서 발급받은 JavaScript 키를 입력하세요.
+    const KAKAO_JS_KEY = "여기에_JavaScript_키_입력";
+
+    if (KAKAO_JS_KEY !== "여기에_JavaScript_키_입력") {
+      Kakao.init(KAKAO_JS_KEY);
+    }
+
+    let pageData = null;
+
+    function show(value) {
+      return value === undefined || value === null || value === ""
+        ? "-"
+        : value;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[c]));
+    }
+
+    async function loadProducts() {
+      const summary = document.getElementById("summary");
+      const container = document.getElementById("products");
+
+      try {
+        const response = await fetch("data/top30.json");
+        if (!response.ok) throw new Error("상품 데이터 파일을 찾을 수 없습니다.");
+
+        pageData = await response.json();
+        const items = pageData.items || [];
+
+        summary.innerHTML =
+          "업데이트: " + escapeHtml(show(pageData.updated_at)) +
+          "<br>상품 수: " + items.length + "개";
+
+        if (!items.length) {
+          container.innerHTML =
+            '<div class="notice">아직 등록된 상품이 없습니다.</div>';
+          return;
+        }
+
+        container.innerHTML = items.map((item, index) => {
+          const url = item.product_url || "#";
+
+          return `
+            <article class="product">
+              <div class="rank">${show(item.rank || index + 1)}위</div>
+              <h2>${escapeHtml(show(item.product_name))}</h2>
+              <div class="brand">${escapeHtml(show(item.brand))}</div>
+
+              <div class="details">
+                <div class="detail">모집 인원<br><b>${escapeHtml(show(item.recruit_count))}</b></div>
+                <div class="detail">신청 인원<br><b>${escapeHtml(show(item.applicant_count))}</b></div>
+                <div class="detail">마감일<br><b>${escapeHtml(show(item.deadline))}</b></div>
+                <div class="detail">현재 경쟁률<br><b>${escapeHtml(show(item.current_ratio))}</b></div>
+                <div class="detail">예상 신청 인원<br><b>${escapeHtml(show(item.predicted_applicants))}</b></div>
+                <div class="detail">예상 경쟁률<br><b>${escapeHtml(show(item.predicted_ratio))}</b></div>
+              </div>
+
+              <div class="actions">
+                <a class="product-link"
+                   href="${escapeHtml(url)}"
+                   target="_blank" rel="noopener noreferrer">
+                  상품 보러 가기
+                </a>
+                <button class="share-one"
+                        onclick="shareProduct(${index})">
+                  카카오톡 공유
+                </button>
+              </div>
+            </article>
+          `;
+        }).join("");
+
+      } catch (error) {
+        summary.textContent = error.message;
+        container.innerHTML =
+          '<div class="notice">상품 데이터를 불러오지 못했습니다.</div>';
+      }
+    }
+
+    function checkKakao() {
+      if (!Kakao.isInitialized()) {
+        alert("카카오 JavaScript 키 설정이 필요합니다.");
+        return false;
+      }
+      return true;
+    }
+
+    function sharePage() {
+      if (!checkKakao()) return;
+
+      Kakao.Share.sendDefault({
+        objectType: "text",
+        text: "오늘의 카카오 체험단 TOP 30을 확인해 보세요!",
+        link: {
+          webUrl: location.href,
+          mobileWebUrl: location.href
+        },
+        buttonTitle: "TOP 30 보러 가기"
+      });
+    }
+
+    function shareProduct(index) {
+      if (!checkKakao()) return;
+
+      const item = pageData.items[index];
+
+      Kakao.Share.sendDefault({
+        objectType: "text",
+        text: (item.brand || "") + " " +
+          (item.product_name || "") + " 체험단 상품을 확인해 보세요!",
+        link: {
+          webUrl: item.product_url,
+          mobileWebUrl: item.product_url
+        },
+        buttonTitle: "상품 보러 가기"
+      });
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>
