@@ -7,9 +7,7 @@
   <meta name="theme-color" content="#ffffff">
   <title>카카오 체험단 TOP 30</title>
 
-  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
-    integrity="sha384-Ti8K4a4v9w9G4yXyJ6v5u4Q0G6v1zQ7fQ8v8Q4z2Q6f5v8x5y4z3w2v1u0t9s8r7"
-    crossorigin="anonymous"></script>
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -27,15 +25,8 @@
       text-align: center;
     }
 
-    header h1 {
-      margin: 0 0 8px;
-      font-size: 23px;
-    }
-
-    header p {
-      margin: 0;
-      font-size: 13px;
-    }
+    header h1 { margin: 0 0 8px; font-size: 23px; }
+    header p { margin: 0; font-size: 13px; }
 
     main {
       max-width: 680px;
@@ -106,10 +97,7 @@
       border-radius: 8px;
     }
 
-    .actions {
-      display: flex;
-      gap: 8px;
-    }
+    .actions { display: flex; gap: 8px; }
 
     .actions a, .actions button {
       flex: 1;
@@ -123,15 +111,8 @@
       cursor: pointer;
     }
 
-    .product-link {
-      color: white;
-      background: #333;
-    }
-
-    .share-one {
-      color: #222;
-      background: #fee500;
-    }
+    .product-link { color: white; background: #333; }
+    .share-one { color: #222; background: #fee500; }
 
     .notice {
       text-align: center;
@@ -162,7 +143,7 @@
   </main>
 
   <script>
-    // 카카오 Developers에서 발급받은 JavaScript 키를 입력하세요.
+    // 카카오 Developers에서 발급받은 JavaScript 키 입력
     const KAKAO_JS_KEY = "여기에_JavaScript_키_입력";
 
     if (KAKAO_JS_KEY !== "여기에_JavaScript_키_입력") {
@@ -193,7 +174,10 @@
 
       try {
         const response = await fetch("data/top30.json");
-        if (!response.ok) throw new Error("상품 데이터 파일을 찾을 수 없습니다.");
+
+        if (!response.ok) {
+          throw new Error("상품 데이터 파일을 찾을 수 없습니다.");
+        }
 
         pageData = await response.json();
         const items = pageData.items || [];
@@ -249,7 +233,7 @@
     }
 
     function checkKakao() {
-      if (!Kakao.isInitialized()) {
+      if (typeof Kakao === "undefined" || !Kakao.isInitialized()) {
         alert("카카오 JavaScript 키 설정이 필요합니다.");
         return false;
       }
