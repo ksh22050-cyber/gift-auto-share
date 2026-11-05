@@ -173,7 +173,9 @@
       const container = document.getElementById("products");
 
       try {
-        const response = await fetch("data/top30.json");
+        const response = await fetch(
+  "https://ksh22050-cyber.github.io/gift-auto-share/data/top30.json?v=" + Date.now()
+);
 
         if (!response.ok) {
           throw new Error("상품 데이터 파일을 찾을 수 없습니다.");
