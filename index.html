@@ -237,33 +237,47 @@
       }
     }
 
-    function checkKakao() {
-      if (typeof Kakao === "undefined") {
-        alert("카카오 SDK를 불러오지 못했습니다.");
-        return false;
+    
+function checkKakao() {
+  if (typeof Kakao === "undefined") {
+    alert("카카오 SDK를 불러오지 못했습니다.");
+    return false;
+  }
+
+  if (!Kakao.isInitialized()) {
+    alert("카카오 JavaScript 키 초기화에 실패했습니다.");
+    return false;
+  }
+
+  return true;
+}
+
+function sharePage() {
+  if (!checkKakao()) return;
+
+  Kakao.Share.sendDefault({
+    objectType: "feed",
+    content: {
+      title: "오늘의 카카오 체험단 TOP 30",
+      description: "오늘 모집 중인 추천 체험단 상품 30개를 확인해 보세요!",
+      imageUrl: "https://ksh22050-cyber.github.io/gift-auto-share/og-image.png",
+      link: {
+        webUrl: "https://ksh22050-cyber.github.io/gift-auto-share/",
+        mobileWebUrl: "https://ksh22050-cyber.github.io/gift-auto-share/"
       }
-
-      if (!Kakao.isInitialized()) {
-        alert("카카오 JavaScript 키 초기화에 실패했습니다.");
-        return false;
-      }
-
-      return true;
-    }
-
-    function sharePage() {
-      if (!checkKakao()) return;
-
-      Kakao.Share.sendDefault({
-        objectType: "text",
-        text: "오늘의 카카오 체험단 TOP 30을 확인해 보세요!",
+    },
+    buttons: [
+      {
+        title: "TOP 30 보러 가기",
         link: {
           webUrl: "https://ksh22050-cyber.github.io/gift-auto-share/",
           mobileWebUrl: "https://ksh22050-cyber.github.io/gift-auto-share/"
-        },
-        buttonTitle: "TOP 30 보러 가기"
-      });
-    }
+        }
+      }
+    ]
+  });
+}
+
 
     function shareProduct(index) {
       if (!checkKakao()) return;
